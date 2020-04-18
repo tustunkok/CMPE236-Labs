@@ -1,0 +1,89 @@
+
+START_POS	EQU	40H
+END_POS		EQU	41H
+VRAM_SIZE	EQU	08D
+
+	ORG	00H
+	SJMP	MAIN
+
+	ORG	30H
+MAIN:	
+	MOV	START_POS, #30H
+	MOV	END_POS, #37H
+	ACALL	SCAN_ROW
+HALT:	SJMP	MAIN
+;===========================================================================
+SCAN_ROW:
+	MOV	R0, #30H
+	ACALL	GENERATE_SHAPE
+	MOV	P0, #00H
+	MOV	P1, #00H
+	MOV	A, #00000001B
+	MOV	R7, #VRAM_SIZE
+
+SCNLP:
+	MOV	P0, #00H
+	MOV	P1, @R0
+	MOV	P0, A
+	RL	A
+	INC	R0
+	PUSH	A
+	ACALL	CHCK_LIMIT
+	POP	A
+	DJNZ	R7,	SCNLP
+	PUSH	A
+	ACALL	DOWN_1
+	POP	A
+	MOV	R7, #VRAM_SIZE
+	SJMP	SCNLP
+
+;===========================================================================
+CHCK_LIMIT:
+	MOV	A, R0
+	SUBB	A, #30H
+	MOV	B, #VRAM_SIZE
+	DIV	AB
+	MOV	A, #30H
+	ADD	A, B
+	MOV	R0, A
+
+	RET
+	
+;===========================================================================
+DOWN_1:
+	DEC	START_POS
+	MOV	A, START_POS
+	CJNE	A, #30H, PR_END
+	MOV	START_POS, #37H
+PR_END:
+	DEC	END_POS
+	MOV	A, END_POS
+	CJNE	A, #30H, EXIT_DOWN
+	MOV	END_POS, #37H
+	
+
+EXIT_DOWN:
+	MOV	R0, START_POS
+	RET
+;===========================================================================
+GENERATE_SHAPE:
+	MOV	30H, #00001000B
+	MOV	31H, #00011100B
+	MOV	32H, #00000000B
+	MOV	33H, #00000000B
+	MOV	34H, #00000000B
+	MOV	35H, #00000000B
+	MOV	36H, #00000000B
+	MOV	37H, #00000000B
+	
+	;MOV	30H,	#00001000B	
+	;MOV	31H,	#00001100B
+	;MOV	32H,	#00001000B
+	;MOV	33H,	#00000000B
+	;MOV	34H,	#00000000B
+	;MOV	35H,	#00000000B
+	;MOV	36H,	#00000000B
+	;MOV	37H,	#00000000B
+	RET
+	END
+
