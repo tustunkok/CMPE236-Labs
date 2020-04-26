@@ -4,8 +4,6 @@ The purpose of this repository is to share the lab contents of the Introduction 
 ## Authors
 - Ozan Can Acar
 - Tolga Üstünkök
-- Buğra Şahinoğlu
-- İbrahim Tarakcı
 
 ## Details
 All of the projects are written with MCU 8051 IDE v1.4.10-3. The main file inside projects is called main.asm. The project names starting with DE indicates that those are the projects created during distance education due to the undergoing COVID-19 pandemic.
