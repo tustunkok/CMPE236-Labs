@@ -15,7 +15,7 @@ HALT:		SJMP	MAIN
 ;===========================================================================
 SCAN_ROW:	ACALL	GENERATE_SHAPE
 
-		MOV	R0, START_POS_LOC
+		MOV	R0, START_POS_LOC		; R0 -> VRAM POINTER
 		MOV	P0, #00H
 		MOV	P1, #00H
 		MOV	A, #00000001B
@@ -27,7 +27,12 @@ SCNLP:		MOV	P0, #00H
 		RL	A
 		INC	R0
 		PUSH	A
+		PUSH	02H
+		PUSH	00H
+		POP	02H
 		ACALL	CHCK_LIMIT
+		MOV	R0, A
+		POP	02H
 		POP	A
 		DJNZ	R2, SCNLP			; R7 CHANGED TO R2
 
@@ -37,26 +42,27 @@ SCNLP:		MOV	P0, #00H
 
 		MOV	R2, #VRAM_SIZE			; R7 CHANGED TO R2
 		SJMP	SCNLP
+		RET
 
 ;===========================================================================
-CHCK_LIMIT:	MOV	A, R0
+CHCK_LIMIT:	MOV	A, R2
+		CLR	C
 		SUBB	A, #START_ADDR
 		MOV	B, #VRAM_SIZE
 		DIV	AB
 		MOV	A, #START_ADDR
 		ADD	A, B
-		MOV	R0, A
 		RET
 ;===========================================================================
 DOWN_1:		DEC	START_POS_LOC
-		MOV	A, START_POS_LOC
-		CJNE	A, #START_ADDR, PR_END
-		MOV	START_POS_LOC, #END_ADDR
+		MOV	R2, START_POS_LOC
+		ACALL	CHCK_LIMIT
+		MOV	START_POS_LOC, A
 
 PR_END:		DEC	END_POS_LOC
-		MOV	A, END_POS_LOC
-		CJNE	A, #START_ADDR, EXIT_DOWN
-		MOV	END_POS_LOC, #END_ADDR
+		MOV	R2, END_POS_LOC
+		ACALL	CHCK_LIMIT
+		MOV	END_POS_LOC, A
 
 EXIT_DOWN:	MOV	R0, START_POS_LOC
 		RET
