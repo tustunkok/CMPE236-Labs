@@ -87,7 +87,7 @@ FOUND:		MOV	A, R4
 
 ; ==================================================
 WRT2LED:	MOV	DPTR, #LED_DATA
-		MOV	A, #0FH
+		MOV	A, #10H
 		CLR	C
 		SUBB	A, R2
 		JC	EXT1
@@ -99,7 +99,7 @@ EXT1:		RET
 ; ==================================================
 		ORG	0200H
 COL_DATA:	DB	70H, 0B0H, 0D0H, 0E0H
-ROW_DATA:	DB	00H
+ROW_DATA:	DB	07H, 0BH, 0DH, 0EH
 LED_DATA:	DB	N0, N1, N2, N3, N4, N5, N6, N7, N8, N9, NA, NB, NC, ND, NE_, NF
 ;MATRIX_LOOKUP:	DB	'1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#', 'D'
 MATRIX_LOOKUP:	DB	01, 02, 03, 0AH, 04, 05, 06, 0BH, 07, 08, 09, 0CH, 0EH, 00, 0EH, 0DH
