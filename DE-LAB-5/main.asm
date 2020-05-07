@@ -4,26 +4,57 @@ N2_LB		EQU	33H
 N2_HB		EQU	32H
 RESULT		EQU	40H
 
-		ORG	00H
+		ORG	0000H
 		SJMP	MAIN
+		ORG	000BH
+		LJMP	LED_SUB
 
-		ORG	30H
-MAIN:		MOV	R2, #03D
+		ORG	0030H
+MAIN:		
+		SETB	IE.7		;EA
+		SETB	ET0		;MOV 	IE,#10000010B
+			
+		MOV	R2, #02D
+		MOV	R3, #00H
 		ACALL	DELAY
 
 HALT:		SJMP	HALT
 
-; PARAMETERS: R2 -> DELAY TIME (MILLISECONDS)
-DELAY:		;MOV	N1_LB, R2
-		;MOV	N1_HB, #00H
-		;MOV	N2_LB, #0E8H
-		;MOV	N2_HB, #03H
+;=========================================================
+LED_SUB:	
+		CLR	TR0
+		;CLR	TF0		;KENDİSİ YAPIYOR
+		CPL	P1.0
+		MOV	R2,	#02H
+		MOV	R3,	#00H
+		ACALL	DELAY
+		RETI
 
-		MOV	N1_LB, #21H
-		MOV	N1_HB, #47H
-		MOV	N2_LB, #2AH
-		MOV	N2_HB, #5FH
+;=========================================================
+; PARAMETERS: R2 -> DELAY TIME (MILLISECONDS)
+DELAY:		
+		MOV	TMOD, #00000001B
+		MOV	TL0, #0FFH
+		MOV	TH0, #0FFH
+
+		MOV	N1_LB, R2
+		MOV	N1_HB, R3
+						;- OVERHEAD
+		MOV	N2_LB, #0E8H
+		MOV	N2_HB, #03H
+
+		
 		ACALL	MUL_2BYTE
+
+		MOV	A, TL0
+		CLR	C
+		SUBB	A, (RESULT + 3)
+		MOV	TL0, A 
+		MOV	A, TH0
+		SUBB	A, (RESULT + 2)
+		MOV	TH0, A
+
+		SETB	TR0
 		RET
 
 MUL_2BYTE:	MOV	R0, #38H
